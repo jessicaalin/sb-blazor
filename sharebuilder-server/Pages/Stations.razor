@@ -1,0 +1,46 @@
+﻿@page "/stations"
+@using sharebuilder_server.Data
+@inject StationService StationService
+
+<PageTitle>TV Stations</PageTitle>
+
+<h1>TV Stations</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (stations == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Call Letters</th>
+                <th>Market</th>
+                <th>Affiliation</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var station in stations)
+            {
+                <tr>
+                    <td>@station.CallLetters</td>
+                    <td>@station.Market</td>
+                    <td>@station.Affiliation</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Station>? stations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stations = await StationService.GetStationsAsync();
+    }
+}
+
