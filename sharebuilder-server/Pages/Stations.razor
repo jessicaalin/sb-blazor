@@ -1,46 +1,94 @@
-﻿@page "/stations"
+﻿@page "/"
 @using sharebuilder_server.Data
 @inject StationService StationService
 
-<PageTitle>TV Stations</PageTitle>
-
-<h1>TV Stations</h1>
-
-<p>This component demonstrates fetching data from a service.</p>
+<PageTitle>Station Dashboard</PageTitle>
 
 @if (stations == null)
 {
-    <p><em>Loading...</em></p>
+    <div class="spinner-border flex justify-content-center py-5" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Call Letters</th>
-                <th>Market</th>
-                <th>Affiliation</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var station in stations)
-            {
-                <tr>
-                    <td>@station.CallLetters</td>
-                    <td>@station.Market</td>
-                    <td>@station.Affiliation</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mt-4 mt-sm-5 mb-3 mx-auto px-4 px-sm-0 px-xl-3 pt-5 pb-4">
+        <h1>Station Dashboard</h1>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false"
+                    @onclick="ToggleDropdown">
+                Select Station
+            </button>
+            <div class="dropdown-menu pre-scrollable @(show? "show":"")">
+                @foreach (var station in stations)
+                {
+                    <button class="dropdown-item" type="button" @onclick="() => SelectStation(station)">
+                        @station.CallLetters
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    @if (selectedStation != null)
+    {
+        <div class="px-4">
+            <div class="container border border-primary rounded mx-auto py-3 px-4 p-md-5">
+                <div class="row pt-3 pb-2">
+                    <div class="col" style="height: 100px">
+                        <img src=@selectedStation.ImageUrl class="h-100 w-auto" alt="Logo of @selectedStation.CallLetters" />
+                    </div>
+                </div>
+                <div class="row py-2">
+                    <div class="col-12 col-sm-4">
+                        <h2>Call Letters</h2>
+                        <p class="mb-0">@selectedStation.CallLetters</p>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <h2>Market</h2>
+                        <p class="mb-0">@selectedStation.Market</p>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <h2>Affiliation</h2>
+                        <p class="mb-0">@selectedStation.Affiliation</p>
+                    </div>
+                </div>
+                <div class="row py-2">
+                    <div class="col">
+                        <h2>Description</h2>
+                        <p class="mb-0">@selectedStation.Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
+    // Populate dropdown with stations
     private List<Station>? stations;
 
     protected override async Task OnInitializedAsync()
     {
         stations = await StationService.GetStationsAsync();
     }
+
+    // Manage dropdown
+    private bool show = false;
+
+    private void ToggleDropdown()
+    {
+        show = !show;
+    }
+
+    // Set current station
+    private Station? selectedStation;
+
+    private void SelectStation(Station station)
+    {
+        selectedStation = station;
+        show = false;
+    }
 }
+
+
 
